@@ -1,0 +1,20 @@
+.
+
+# test requirements
+pre-commit
+mypy
+flake8
+autopep8
+black
+pylint
+pytest
+pytest-cov
+pytest-mock
+sphinx
+sphinx-rtd-theme
+
+cloudpickle
+
+# publish to pypi
+wheel
+twine
