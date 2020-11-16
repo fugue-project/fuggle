@@ -1,7 +1,7 @@
 # flake8: noqa
 import html
 from datetime import datetime
-from typing import Any, List
+from typing import Any, List, Optional, Dict, Tuple
 
 import pandas as pd
 from fugue import ExecutionEngine, Schema
@@ -11,9 +11,10 @@ from fugue_sql import FugueSQLWorkflow
 from IPython.core.magic import register_cell_magic
 from IPython.display import HTML, Javascript, display
 from pyspark.sql import SparkSession
-from triad.utils.convert import to_instance
+from triad.utils.convert import get_caller_global_local_vars, to_instance
 
 from fuggle.execution_engine import KaggleNativeExecutionEngine
+import inspect
 
 
 class EngineFactory(object):
@@ -82,12 +83,29 @@ def register_magic(default_engine: Any) -> None:
     def fsql(line: Any, cell: Any) -> None:  # type: ignore
         start = datetime.now()
         try:
+            global_vars = _get_caller_global_vars()
             dag = FugueSQLWorkflow()
-            dag(cell)
+            dag(cell, global_vars)
             dag.run(engine if line == "" else ENGINE_FACTORY.make_engine(line))
         finally:
             sec = (datetime.now() - start).total_seconds()
             display(HTML(f"<small><u>{sec} seconds</u></small>"))
+
+
+def _get_caller_global_vars(
+    global_vars: Optional[Dict[str, Any]] = None,
+    max_depth: int = 10,
+) -> Dict[str, Any]:
+    cf = inspect.currentframe()
+    stack: Any = cf.f_back.f_back  # type: ignore
+    while stack is not None and max_depth > 0:
+        if global_vars is None:
+            global_vars = stack.f_globals  # type: ignore
+        else:
+            global_vars.update(stack.f_globals)
+        stack = stack.f_back  # type: ignore
+        max_depth -= 1
+    return global_vars  # type: ignore
 
 
 def set_print_hook() -> None:
