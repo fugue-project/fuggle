@@ -1,9 +1,10 @@
 # flake8: noqa
 import html
+from datetime import datetime
 from typing import Any, List
 
 import pandas as pd
-from fugue import ExecutionEngine, NativeExecutionEngine, Schema
+from fugue import ExecutionEngine, Schema
 from fugue.extensions._builtins.outputters import Show
 from fugue_spark import SparkExecutionEngine
 from fugue_sql import FugueSQLWorkflow
@@ -12,6 +13,8 @@ from IPython.display import HTML, Javascript, display
 from pyspark.sql import SparkSession
 from triad.utils.convert import to_instance
 
+from fuggle.execution_engine import KaggleNativeExecutionEngine
+
 
 class EngineFactory(object):
     def __init__(self, default_engine: Any = None):
@@ -19,7 +22,7 @@ class EngineFactory(object):
 
     def make_engine(self, engine: Any) -> ExecutionEngine:
         if engine is None or (isinstance(engine, str) and engine in ["native", ""]):
-            return NativeExecutionEngine()
+            return KaggleNativeExecutionEngine(use_sqlite=False)
         if isinstance(engine, str) and engine == "spark":
             spark_session = (
                 SparkSession.builder.master("local[*]")
@@ -38,8 +41,7 @@ class EngineFactory(object):
 ENGINE_FACTORY = EngineFactory("native")
 
 
-def register_highlight() -> Any:
-    js = """
+HIGHLIGHT_JS = """
 require(["codemirror/lib/codemirror"]);
 
 function set(str) {
@@ -62,27 +64,30 @@ CodeMirror.defineMIME("text/x-mssql", {
 
 
 require(['notebook/js/codecell'], function(codecell) {
-    codecell.CodeCell.options_default.highlight_modes['magic_text/x-mssql'] = {'reg':[/^%%fsql/]} ;
+    codecell.CodeCell.options_default.highlight_modes['magic_text/x-mssql'] = {'reg':[/%%fsql/]} ;
     Jupyter.notebook.events.one('kernel_ready.Kernel', function(){
     Jupyter.notebook.get_cells().map(function(cell){
         if (cell.cell_type == 'code'){ cell.auto_highlight(); } }) ;
     });
   });
 
-    """
-    return js
+"""
 
 
-def register_magic() -> None:
+def register_magic(default_engine: Any) -> None:
+    engine = ENGINE_FACTORY.make_engine(default_engine)
+    display(HTML(f"<strong>{engine} is set as backend<strong>"))
+
     @register_cell_magic
-    def fsql(line, cell):
-        dag = FugueSQLWorkflow()
-        dag(cell)
-        dag.run(
-            ENGINE_FACTORY.default_engine
-            if line == ""
-            else ENGINE_FACTORY.make_engine(line)
-        )
+    def fsql(line: Any, cell: Any) -> None:  # type: ignore
+        start = datetime.now()
+        try:
+            dag = FugueSQLWorkflow()
+            dag(cell)
+            dag.run(engine if line == "" else ENGINE_FACTORY.make_engine(line))
+        finally:
+            sec = (datetime.now() - start).total_seconds()
+            display(HTML(f"<small><u>{sec} seconds</u></small>"))
 
 
 def set_print_hook() -> None:
@@ -94,13 +99,13 @@ def set_print_hook() -> None:
         pdf = pd.DataFrame(head_rows, columns=list(schema.names))
         display(pdf)
         if count >= 0:
-            display(HTML(f"total count: {count}"))
+            display(HTML(f"<strong>total count: {count}</strong>"))
         display(HTML(f"<small>schema: {schema}</small>"))
 
     Show.set_hook(pprint)
 
 
-def setup() -> Any:
-    register_magic()
+def setup(default_engine: Any = None) -> Any:
+    register_magic(default_engine)
     set_print_hook()
-    return Javascript(register_highlight())
+    return Javascript(HIGHLIGHT_JS)
