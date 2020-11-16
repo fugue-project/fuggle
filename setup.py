@@ -17,7 +17,7 @@ setup(
     author_email="goodwanghan@gmail.com",
     keywords="fugue kaggle",
     url="http://github.com/fugue-project/fuggle",
-    install_requires=["fugue[spark]>=0.4.7"],
+    install_requires=["fugue[spark]>=0.4.7", "notebook", "kaggle"],
     extras_require={},
     classifiers=[
         # "3 - Alpha", "4 - Beta" or "5 - Production/Stable"
@@ -25,10 +25,9 @@ setup(
         "Intended Audience :: Developers",
         "Topic :: Software Development :: Libraries :: Python Modules",
         "License :: OSI Approved :: Apache Software License",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3 :: Only",
     ],
-    python_requires=">=3.6",
+    python_requires=">=3.7",
 )
