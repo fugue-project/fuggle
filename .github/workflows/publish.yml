@@ -21,12 +21,12 @@ jobs:
       run: make dev
     - name: Test
       run: make test
-    - name: Coveralls
-      env:
-        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
-      run: |
-        pip install coveralls
-        coveralls
+    # - name: Coveralls
+    #   env:
+    #     COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+    #   run: |
+    #     pip install coveralls
+    #     coveralls
     - name: Build and publish
       env:
         TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
