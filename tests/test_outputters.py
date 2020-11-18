@@ -68,6 +68,10 @@ def test_plot():
             ),
         )  # bad order by
 
+        # multiple partition keys
+        df = dag.df([[0, 10, 1, 2], [0, 10, 3, 4], [0, 12, 5, 6], [1, 13, 2, 3]], "a:int,b:int,c:int,d:int")
+        df.partition(by=["a","b"]).output(Plot, params=dict(kind="line", x="c"))
+    
 
 def test_derived_plot():
     with FugueWorkflow(KaggleNativeExecutionEngine()) as dag:
