@@ -115,7 +115,7 @@ class Plot(Outputter):
                 sub = gp.drop(figure, axis=1).groupby(x).sum()
                 sub = self._sort_sub(sub, order_by)
                 ax = fig.add_subplot(specs[i])
-                sub.plot(y=y, kind=kind, title=title, ax=ax, **kwargs)
+                sub.plot(y=y, kind=kind, title=str(title), ax=ax, **kwargs)
                 i += 1
         else:
             fig, specs = _create_fig(1, width=width, height=height)

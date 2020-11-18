@@ -27,7 +27,8 @@ class EngineFactory(object):
         if isinstance(engine, str) and engine == "spark":
             spark_session = (
                 SparkSession.builder.master("local[*]")
-                .config("spark.driver.memory", "12g")
+                .config("spark.driver.memory", "14g")
+                .config("spark.sql.shuffle.partitions", "16")
                 .config("fugue.spark.use_pandas_udf", True)
                 .getOrCreate()
             )
