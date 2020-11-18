@@ -17,7 +17,7 @@ setup(
     author_email="goodwanghan@gmail.com",
     keywords="fugue kaggle",
     url="http://github.com/fugue-project/fuggle",
-    install_requires=["fugue[spark]>=0.4.7", "notebook", "kaggle"],
+    install_requires=["fugue[spark]>=0.4.7", "notebook", "kaggle", "matplotlib"],
     extras_require={},
     classifiers=[
         # "3 - Alpha", "4 - Beta" or "5 - Production/Stable"
