@@ -4,9 +4,13 @@ Fugue for Kaggle users
 
 ## Release History
 
+### 0.0.6
+
+* Fix rendering issue
+
 ### 0.0.5
 
-* fine tune of the experience
+* Fine tune of the experience
 
 ### 0.0.4
 
