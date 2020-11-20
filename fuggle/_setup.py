@@ -78,7 +78,7 @@ require(['notebook/js/codecell'], function(codecell) {
 
 def register_magic(default_engine: Any) -> None:
     engine = ENGINE_FACTORY.make_engine(default_engine)
-    display(HTML(f"<strong>{engine} is set as backend<strong>"))
+    print(f"{engine} is set as backend")
 
     @register_cell_magic
     def fsql(line: Any, cell: Any) -> None:  # type: ignore
