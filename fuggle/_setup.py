@@ -1,7 +1,8 @@
 # flake8: noqa
 import html
+import inspect
 from datetime import datetime
-from typing import Any, List, Optional, Dict, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
 from fugue import ExecutionEngine, Schema
@@ -11,30 +12,33 @@ from fugue_sql import FugueSQLWorkflow
 from IPython.core.magic import register_cell_magic
 from IPython.display import HTML, Javascript, display
 from pyspark.sql import SparkSession
+from triad import ParamDict
 from triad.utils.convert import get_caller_global_local_vars, to_instance
 
 from fuggle.execution_engine import (
     KaggleNativeExecutionEngine,
     KaggleSparkExecutionEngine,
 )
-import inspect
 
 
 class EngineFactory(object):
-    def __init__(self, default_engine: Any = None):
-        self._default_engine = self.make_engine(default_engine)
+    def __init__(self, default_engine: Any, conf: Any = None):
+        self._default_engine = self.make_engine(default_engine, conf)
 
-    def make_engine(self, engine: Any) -> ExecutionEngine:
+    def make_engine(self, engine: Any, conf: Any) -> ExecutionEngine:
         if engine is None or (isinstance(engine, str) and engine in ["native", ""]):
-            return KaggleNativeExecutionEngine(use_sqlite=False)
+            return KaggleNativeExecutionEngine(conf=conf, use_sqlite=False)
         if isinstance(engine, str) and engine == "spark":
-            spark_session = (
-                SparkSession.builder.master("local[*]")
-                .config("spark.driver.memory", "14g")
-                .config("spark.sql.shuffle.partitions", "16")
-                .config("fugue.spark.use_pandas_udf", True)
-                .getOrCreate()
-            )
+            configs = {
+                "spark.driver.memory": "14g",
+                "spark.sql.shuffle.partitions": "16",
+                "fugue.spark.use_pandas_udf": True,
+            }
+            configs.update(ParamDict(conf))
+            builder = SparkSession.builder.master("local[*]")
+            for k, v in configs.items():
+                builder = builder.config(k, v)
+            spark_session = builder.getOrCreate()
             return KaggleSparkExecutionEngine(spark_session)
         return to_instance(engine, ExecutionEngine)
 
@@ -79,8 +83,8 @@ require(['notebook/js/codecell'], function(codecell) {
 """
 
 
-def register_magic(default_engine: Any) -> None:
-    engine = ENGINE_FACTORY.make_engine(default_engine)
+def register_magic(default_engine: Any, conf: Any) -> None:
+    engine = ENGINE_FACTORY.make_engine(default_engine, conf)
     print(f"{engine} is set as backend")
 
     @register_cell_magic
@@ -90,7 +94,7 @@ def register_magic(default_engine: Any) -> None:
             global_vars = _get_caller_global_vars()
             dag = FugueSQLWorkflow()
             dag(cell, global_vars)
-            dag.run(engine if line == "" else ENGINE_FACTORY.make_engine(line))
+            dag.run(engine if line == "" else ENGINE_FACTORY.make_engine(line, conf))
         finally:
             sec = (datetime.now() - start).total_seconds()
             display(HTML(f"<small><u>{sec} seconds</u></small>"))
@@ -127,7 +131,7 @@ def set_print_hook() -> None:
     Show.set_hook(pprint)
 
 
-def setup(default_engine: Any = None) -> Any:
-    register_magic(default_engine)
+def setup(default_engine: Any = None, conf: Any = None) -> Any:
+    register_magic(default_engine, conf)
     set_print_hook()
     return Javascript(HIGHLIGHT_JS)
