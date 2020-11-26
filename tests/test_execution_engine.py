@@ -60,6 +60,10 @@ class KaggleSparkExecutionEngineTests(ExecutionEngineTests.Tests):
 
 
 class KaggleSparkExecutionEngineBuiltInTests(BuiltInTests.Tests):
+    @pytest.fixture(autouse=True)
+    def init_session(self, spark_session):
+        self.spark_session = spark_session
+
     def make_engine(self):
         e = KaggleSparkExecutionEngine(
             conf={
