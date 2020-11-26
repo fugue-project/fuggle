@@ -2,5 +2,8 @@
 from fuggle_version import __version__
 
 from fuggle._setup import setup
-from fuggle.execution_engine import KaggleNativeExecutionEngine
+from fuggle.execution_engine import (
+    KaggleNativeExecutionEngine,
+    KaggleSparkExecutionEngine,
+)
 from fuggle.outputters import Plot, PlotBar, PlotBarH, PlotLine
