@@ -4,6 +4,10 @@ Fugue for Kaggle users
 
 ## Release History
 
+### 0.0.8
+
+* Make setup function configurable
+
 ### 0.0.7
 
 * Add Kaggle sqlite data handling logic
