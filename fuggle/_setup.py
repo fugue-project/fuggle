@@ -46,7 +46,7 @@ class EngineFactory(object):
 ENGINE_FACTORY = EngineFactory("native")
 
 
-HIGHLIGHT_JS = """
+HIGHLIGHT_JS = r"""
 require(["codemirror/lib/codemirror"]);
 
 function set(str) {
