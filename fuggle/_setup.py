@@ -13,7 +13,10 @@ from IPython.display import HTML, Javascript, display
 from pyspark.sql import SparkSession
 from triad.utils.convert import get_caller_global_local_vars, to_instance
 
-from fuggle.execution_engine import KaggleNativeExecutionEngine
+from fuggle.execution_engine import (
+    KaggleNativeExecutionEngine,
+    KaggleSparkExecutionEngine,
+)
 import inspect
 
 
@@ -32,7 +35,7 @@ class EngineFactory(object):
                 .config("fugue.spark.use_pandas_udf", True)
                 .getOrCreate()
             )
-            return SparkExecutionEngine(spark_session)
+            return KaggleSparkExecutionEngine(spark_session)
         return to_instance(engine, ExecutionEngine)
 
     @property

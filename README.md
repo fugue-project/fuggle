@@ -4,6 +4,10 @@ Fugue for Kaggle users
 
 ## Release History
 
+### 0.0.7
+
+* Add Kaggle sqlite data handling logic
+
 ### 0.0.6
 
 * Fix rendering issue
