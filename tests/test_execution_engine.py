@@ -23,7 +23,7 @@ class KaggleNativeExecutionEngineBuiltInTests(BuiltInTests.Tests):
         e = KaggleNativeExecutionEngine(
             conf={
                 "test": True,
-                "fugue.kaggle.sqlite.path": os.path.join(os.getcwd(), "tests/data"),
+                "fuggle.sqlite.path": os.path.join(os.getcwd(), "tests/data"),
             }
         )
         return e
@@ -68,7 +68,7 @@ class KaggleSparkExecutionEngineBuiltInTests(BuiltInTests.Tests):
         e = KaggleSparkExecutionEngine(
             conf={
                 "test": True,
-                "fugue.kaggle.sqlite.path": os.path.join(os.getcwd(), "tests/data"),
+                "fuggle.sqlite.path": os.path.join(os.getcwd(), "tests/data"),
             }
         )
         return e

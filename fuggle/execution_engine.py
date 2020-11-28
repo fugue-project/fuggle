@@ -41,7 +41,7 @@ class KaggleSQLEngineWrapper(SQLEngine):
         super().__init__(execution_engine)
         self.engine = engine
         self.database_path = execution_engine.conf.get(
-            "fugue.kaggle.sqlite.path", "/kaggle/input"
+            "fuggle.sqlite.path", "/kaggle/input"
         )
 
     def select(self, dfs: DataFrames, statement: str) -> DataFrame:
