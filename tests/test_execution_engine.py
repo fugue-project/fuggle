@@ -1,7 +1,11 @@
 import os
 
 import pytest
-from fuggle import KaggleNativeExecutionEngine, KaggleSparkExecutionEngine
+from fuggle import (
+    KaggleNativeExecutionEngine,
+    KaggleSparkExecutionEngine,
+    KaggleDaskExecutionEngine,
+)
 from fugue_sql import FugueSQLWorkflow
 from fugue_test.builtin_suite import BuiltInTests
 from fugue_test.execution_suite import ExecutionEngineTests
@@ -23,7 +27,7 @@ class KaggleNativeExecutionEngineBuiltInTests(BuiltInTests.Tests):
         e = KaggleNativeExecutionEngine(
             conf={
                 "test": True,
-                "fugue.kaggle.sqlite.path": os.path.join(os.getcwd(), "tests/data"),
+                "fuggle.sqlite.path": os.path.join(os.getcwd(), "tests/data"),
             }
         )
         return e
@@ -68,7 +72,51 @@ class KaggleSparkExecutionEngineBuiltInTests(BuiltInTests.Tests):
         e = KaggleSparkExecutionEngine(
             conf={
                 "test": True,
-                "fugue.kaggle.sqlite.path": os.path.join(os.getcwd(), "tests/data"),
+                "fuggle.sqlite.path": os.path.join(os.getcwd(), "tests/data"),
+            }
+        )
+        return e
+
+    def dag(self) -> FugueSQLWorkflow:
+        return FugueSQLWorkflow(self.engine)
+
+    def test_sqlite(self):
+        with self.dag() as dag:
+            dag(
+                """
+            SELECT COUNT(*) AS ct FROM customer.sqlite.customer
+            PRINT
+            """
+            )
+
+    def test_repartition(self):
+        pass
+
+
+class DaskExecutionEngineTests(ExecutionEngineTests.Tests):
+    def make_engine(self):
+        e = KaggleDaskExecutionEngine(
+            conf={
+                "test": True,
+                "fuggle.sqlite.path": os.path.join(os.getcwd(), "tests/data"),
+            }
+        )
+        return e
+
+    def test__join_outer_pandas_incompatible(self):
+        return
+
+    def test_map_with_dict_col(self):
+        # TODO: add back
+        return
+
+
+class DaskExecutionEngineBuiltInTests(BuiltInTests.Tests):
+    def make_engine(self):
+        e = KaggleDaskExecutionEngine(
+            conf={
+                "test": True,
+                "fuggle.sqlite.path": os.path.join(os.getcwd(), "tests/data"),
             }
         )
         return e

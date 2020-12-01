@@ -7,6 +7,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import pandas as pd
 from fugue import ExecutionEngine, Schema
 from fugue.extensions._builtins.outputters import Show
+from fugue_dask._constants import FUGUE_DASK_CONF_DATAFRAME_DEFAULT_PARTITIONS
 from fugue_spark import SparkExecutionEngine
 from fugue_sql import FugueSQLWorkflow
 from IPython.core.magic import register_cell_magic
@@ -16,6 +17,7 @@ from triad import ParamDict
 from triad.utils.convert import get_caller_global_local_vars, to_instance
 
 from fuggle.execution_engine import (
+    KaggleDaskExecutionEngine,
     KaggleNativeExecutionEngine,
     KaggleSparkExecutionEngine,
 )
@@ -40,6 +42,9 @@ class EngineFactory(object):
                 builder = builder.config(k, v)
             spark_session = builder.getOrCreate()
             return KaggleSparkExecutionEngine(spark_session)
+        if isinstance(engine, str) and engine == "dask":
+            configs = {FUGUE_DASK_CONF_DATAFRAME_DEFAULT_PARTITIONS: 16}
+            return KaggleDaskExecutionEngine(conf=configs)
         return to_instance(engine, ExecutionEngine)
 
     @property
@@ -97,7 +102,7 @@ def register_magic(default_engine: Any, conf: Any) -> None:
             dag.run(engine if line == "" else ENGINE_FACTORY.make_engine(line, conf))
         finally:
             sec = (datetime.now() - start).total_seconds()
-            display(HTML(f"<small><u>{sec} seconds</u></small>"))
+            print(f"{sec} seconds")
 
 
 def _get_caller_global_vars(
@@ -120,13 +125,15 @@ def set_print_hook() -> None:
     def pprint(
         schema: Schema, head_rows: List[List[Any]], title: Any, rows: int, count: int
     ):
+        components: List[Any] = []
         if title is not None:
-            display(HTML(f"<h3>{html.escape(title)}</h3>"))
+            components.append(HTML(f"<h3>{html.escape(title)}</h3>"))
         pdf = pd.DataFrame(head_rows, columns=list(schema.names))
-        display(pdf)
+        components.append(pdf)
         if count >= 0:
-            display(HTML(f"<strong>total count: {count}</strong>"))
-        display(HTML(f"<small>schema: {schema}</small>"))
+            components.append(HTML(f"<strong>total count: {count}</strong>"))
+        components.append(HTML(f"<small>schema: {schema}</small>"))
+        display(*components)
 
     Show.set_hook(pprint)
 

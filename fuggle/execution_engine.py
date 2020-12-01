@@ -12,6 +12,7 @@ from fugue import (
     SQLEngine,
     SqliteEngine,
 )
+from fugue_dask.execution_engine import DaskExecutionEngine, QPDDaskEngine
 from fugue_spark.execution_engine import SparkExecutionEngine, SparkSQLEngine
 from pyspark.sql import SparkSession
 from qpd_pandas import run_sql_on_pandas
@@ -41,7 +42,7 @@ class KaggleSQLEngineWrapper(SQLEngine):
         super().__init__(execution_engine)
         self.engine = engine
         self.database_path = execution_engine.conf.get(
-            "fugue.kaggle.sqlite.path", "/kaggle/input"
+            "fuggle.sqlite.path", "/kaggle/input"
         )
 
     def select(self, dfs: DataFrames, statement: str) -> DataFrame:
@@ -75,3 +76,9 @@ class KaggleSparkExecutionEngine(SparkExecutionEngine):
     def __init__(self, spark_session: Optional[SparkSession] = None, conf: Any = None):
         super().__init__(spark_session=spark_session, conf=conf)
         self._default_sql_engine = KaggleSQLEngineWrapper(self, SparkSQLEngine(self))
+
+
+class KaggleDaskExecutionEngine(DaskExecutionEngine):
+    def __init__(self, conf: Any = None):
+        super().__init__(conf=conf)
+        self._default_sql_engine = KaggleSQLEngineWrapper(self, QPDDaskEngine(self))
