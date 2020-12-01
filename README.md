@@ -4,6 +4,10 @@ Fugue for Kaggle users
 
 ## Release History
 
+### 0.0.9
+
+* Add dask support
+
 ### 0.0.8
 
 * Make setup function configurable
