@@ -17,7 +17,14 @@ setup(
     author_email="goodwanghan@gmail.com",
     keywords="fugue kaggle",
     url="http://github.com/fugue-project/fuggle",
-    install_requires=["fugue[spark,dask]>=0.4.8", "notebook", "kaggle", "matplotlib"],
+    install_requires=[
+        "fugue[spark,dask]>=0.4.8",
+        "notebook",
+        "kaggle",
+        "matplotlib",
+        "qpd",
+        "dask[dataframe]",
+    ],
     extras_require={},
     classifiers=[
         # "3 - Alpha", "4 - Beta" or "5 - Production/Stable"
