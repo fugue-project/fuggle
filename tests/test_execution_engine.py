@@ -62,6 +62,9 @@ class KaggleSparkExecutionEngineTests(ExecutionEngineTests.Tests):
     def test__join_outer_pandas_incompatible(self):
         return
 
+    def test_sample_n(self):
+        pass
+
 
 class KaggleSparkExecutionEngineBuiltInTests(BuiltInTests.Tests):
     @pytest.fixture(autouse=True)
@@ -109,6 +112,9 @@ class DaskExecutionEngineTests(ExecutionEngineTests.Tests):
     def test_map_with_dict_col(self):
         # TODO: add back
         return
+
+    def test_sample_n(self):
+        pass
 
 
 class DaskExecutionEngineBuiltInTests(BuiltInTests.Tests):

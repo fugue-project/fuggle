@@ -8,3 +8,4 @@ from fuggle.execution_engine import (
     KaggleSparkExecutionEngine,
 )
 from fuggle.outputters import Plot, PlotBar, PlotBarH, PlotLine
+from fuggle.workflow import Dag
