@@ -4,6 +4,11 @@ Fugue for Kaggle users
 
 ## Release History
 
+### 0.1.0
+
+* Add Dag class for convenience
+* Updated highlights
+
 ### 0.0.9
 
 * Add dask support
