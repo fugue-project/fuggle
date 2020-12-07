@@ -23,7 +23,12 @@ class Plot(Outputter):
         self.params.get("top_n", 0)
         _parse_presort_exp(self.params.get("order_by", "a"))
         self.params.get_or_throw("x", str)
-        self.params.get_or_none("y", object)
+        y = self.params.get_or_none("y", object)
+        gp = self.params.get_or_none("group", object)
+        assert_or_throw(
+            gp is None or isinstance(y, str),
+            "when group is set, y must be set as a string",
+        )
         self.params.get("height", 0.5)
         width = self.params.get("width", 1.0)
         assert_or_throw(width in [0.5, 1.0], ValueError())
@@ -32,8 +37,11 @@ class Plot(Outputter):
         kwargs: Dict[str, Any] = {
             k: v
             for k, v in self.params.items()
-            if k not in ["top_n", "order_by", "x", "y", "kind", "width", "height"]
+            if k
+            not in ["top_n", "order_by", "x", "y", "kind", "width", "height", "group"]
         }
+        if "group" in self.params:
+            print(self.params)
         top_n = self.params.get("top_n", 0)
         df = self._select_top(dfs[0], top_n).as_pandas()
         if "order_by" in self.params:
@@ -51,6 +59,7 @@ class Plot(Outputter):
             width=self.params.get("width", 1.0),
             height=self.params.get("height", 0.5),
             order_by=order_by,
+            group=self.params.get_or_none("group", object),
             **kwargs,
         )
 
@@ -105,6 +114,7 @@ class Plot(Outputter):
         width: float,
         height: float,
         order_by: Dict[str, bool],
+        group: Any,
         **kwargs,
     ) -> None:
         if len(figure) > 0:
@@ -112,17 +122,45 @@ class Plot(Outputter):
             fig, specs = _create_fig(groups.ngroups, width=width, height=height)
             i = 0
             for title, gp in df.groupby(figure):
-                sub = gp.drop(figure, axis=1).groupby(x).sum()
+                sub = gp.drop(figure, axis=1)
                 sub = self._sort_sub(sub, order_by)
                 ax = fig.add_subplot(specs[i])
-                sub.plot(y=y, kind=kind, title=str(title), ax=ax, **kwargs)
+                self._plot_sub(
+                    sub=sub,
+                    group=group,
+                    x=x,
+                    y=y,
+                    kind=kind,
+                    ax=ax,
+                    title=str(title),
+                    **kwargs,
+                )
                 i += 1
         else:
             fig, specs = _create_fig(1, width=width, height=height)
             ax = fig.add_subplot(specs[0])
-            sub = df.groupby(x).sum()
-            sub = self._sort_sub(sub, order_by)
-            sub.plot(y=y, kind=kind, ax=ax, **kwargs)
+            sub = self._sort_sub(df, order_by)
+            self._plot_sub(sub=sub, group=group, x=x, y=y, kind=kind, ax=ax, **kwargs)
+
+    def _plot_sub(
+        self,
+        sub: pd.DataFrame,
+        group: Any,
+        x: Any,
+        y: Any,
+        kind: str,
+        ax: Any,
+        **kwargs: Any,
+    ):
+        print(sub)
+        if group is None:
+            sub.plot(x=x, y=y, kind=kind, ax=ax, **kwargs)
+        else:
+            names: List[str] = []
+            for name, gp in sub.groupby(group):
+                gp.plot(x=x, y=y, kind=kind, ax=ax, **kwargs)
+                names.append(str(name))
+            ax.legend(names)
 
     def _sort_sub(self, sdf: pd.DataFrame, order_by: Dict[str, Any]) -> pd.DataFrame:
         if len(order_by) > 0:
