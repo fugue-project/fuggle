@@ -40,8 +40,6 @@ class Plot(Outputter):
             if k
             not in ["top_n", "order_by", "x", "y", "kind", "width", "height", "group"]
         }
-        if "group" in self.params:
-            print(self.params)
         top_n = self.params.get("top_n", 0)
         df = self._select_top(dfs[0], top_n).as_pandas()
         if "order_by" in self.params:
@@ -152,7 +150,6 @@ class Plot(Outputter):
         ax: Any,
         **kwargs: Any,
     ):
-        print(sub)
         if group is None:
             sub.plot(x=x, y=y, kind=kind, ax=ax, **kwargs)
         else:
