@@ -4,6 +4,10 @@ Fugue for Kaggle users
 
 ## Release History
 
+### 0.1.2
+
+* remove print
+
 ### 0.1.1
 
 * Add `group` to plot

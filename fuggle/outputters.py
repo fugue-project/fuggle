@@ -40,8 +40,6 @@ class Plot(Outputter):
             if k
             not in ["top_n", "order_by", "x", "y", "kind", "width", "height", "group"]
         }
-        if "group" in self.params:
-            print(self.params)
         top_n = self.params.get("top_n", 0)
         df = self._select_top(dfs[0], top_n).as_pandas()
         if "order_by" in self.params:
@@ -123,7 +121,7 @@ class Plot(Outputter):
             i = 0
             for title, gp in df.groupby(figure):
                 sub = gp.drop(figure, axis=1)
-                sub = self._sort_sub(sub, order_by)
+                sub = self._sort_sub(sub, x, order_by)
                 ax = fig.add_subplot(specs[i])
                 self._plot_sub(
                     sub=sub,
@@ -139,7 +137,7 @@ class Plot(Outputter):
         else:
             fig, specs = _create_fig(1, width=width, height=height)
             ax = fig.add_subplot(specs[0])
-            sub = self._sort_sub(df, order_by)
+            sub = self._sort_sub(df, x, order_by)
             self._plot_sub(sub=sub, group=group, x=x, y=y, kind=kind, ax=ax, **kwargs)
 
     def _plot_sub(
@@ -152,7 +150,6 @@ class Plot(Outputter):
         ax: Any,
         **kwargs: Any,
     ):
-        print(sub)
         if group is None:
             sub.plot(x=x, y=y, kind=kind, ax=ax, **kwargs)
         else:
@@ -162,11 +159,15 @@ class Plot(Outputter):
                 names.append(str(name))
             ax.legend(names)
 
-    def _sort_sub(self, sdf: pd.DataFrame, order_by: Dict[str, Any]) -> pd.DataFrame:
+    def _sort_sub(
+        self, sdf: pd.DataFrame, x: Any, order_by: Dict[str, Any]
+    ) -> pd.DataFrame:
         if len(order_by) > 0:
             sdf = sdf.sort_values(
                 list(order_by.keys()), ascending=list(order_by.values())
             )
+        else:
+            sdf = sdf.sort_values(x)
         return sdf
 
 
@@ -187,11 +188,15 @@ class PlotBarH(Plot):
     def kind(self) -> str:
         return "barh"
 
-    def _sort_sub(self, sdf: pd.DataFrame, order_by: Dict[str, Any]) -> pd.DataFrame:
+    def _sort_sub(
+        self, sdf: pd.DataFrame, x: Any, order_by: Dict[str, Any]
+    ) -> pd.DataFrame:
         if len(order_by) > 0:
             sdf = sdf.sort_values(
                 list(order_by.keys()), ascending=[~x for x in order_by.values()]
             )
+        else:
+            sdf = sdf.sort_values(x, ascending=False)
         return sdf
 
 
