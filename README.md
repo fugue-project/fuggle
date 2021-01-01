@@ -4,9 +4,13 @@ Fugue for Kaggle users
 
 ## Release History
 
+### 0.1.5
+
+* Disable pandas udf (kaggle upgraded to java 11, spark is hard to config)
+
 ### 0.1.2
 
-* remove print
+* Remove print
 
 ### 0.1.1
 

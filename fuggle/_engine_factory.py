@@ -28,7 +28,7 @@ class EngineFactory(object):
             configs = {
                 "spark.driver.memory": "14g",
                 "spark.sql.shuffle.partitions": "16",
-                "fugue.spark.use_pandas_udf": True,
+                "fugue.spark.use_pandas_udf": False,
             }
             configs.update(conf)
             builder = SparkSession.builder.master("local[*]")
