@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 import pandas as pd
-from fugue import Schema
+from fugue import Schema, FugueWorkflow, WorkflowDataFrame
 from fugue.extensions._builtins.outputters import Show
 from fugue_sql import FugueSQLWorkflow
 from IPython.core.magic import register_cell_magic
@@ -54,8 +54,8 @@ def register_magic(default_engine: Any, conf: Any) -> None:
     def fsql(line: Any, cell: Any) -> None:  # type: ignore
         start = datetime.now()
         try:
-            global_vars = _get_caller_global_vars()
             dag = FugueSQLWorkflow()
+            global_vars = _get_caller_global_vars(dag)
             dag(cell, global_vars)
             dag.run(engine if line == "" else ENGINE_FACTORY.make_engine(line, conf))
         finally:
@@ -64,6 +64,7 @@ def register_magic(default_engine: Any, conf: Any) -> None:
 
 
 def _get_caller_global_vars(
+    dag: FugueWorkflow,
     global_vars: Optional[Dict[str, Any]] = None,
     max_depth: int = 10,
 ) -> Dict[str, Any]:
@@ -76,7 +77,11 @@ def _get_caller_global_vars(
             global_vars.update(stack.f_globals)
         stack = stack.f_back  # type: ignore
         max_depth -= 1
-    return global_vars  # type: ignore
+    return {
+        k: v
+        for k, v in global_vars.items()  # type: ignore
+        if not isinstance(v, WorkflowDataFrame) or v.workflow is dag
+    }
 
 
 def set_print_hook() -> None:
