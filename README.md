@@ -4,6 +4,10 @@ Fugue for Kaggle users
 
 ## Release History
 
+### 0.1.7
+
+* Refactor fuggle based on fugue_notebook
+
 ### 0.1.6
 
 * Fix sql global variable import
