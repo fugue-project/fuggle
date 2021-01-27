@@ -16,6 +16,7 @@ dev:
 	pip3 install -r requirements.txt
 
 jupyter:
+	pip install .
 	jupyter notebook --port=8888 --ip=0.0.0.0 --no-browser --allow-root --NotebookApp.token='' --NotebookApp.password=''
 
 docs:
