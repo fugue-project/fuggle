@@ -1,11 +1,18 @@
 # flake8: noqa
-from fuggle_version import __version__
+from typing import Any
 
-from fuggle._setup import setup
+import fugue_notebook as fn
+from fuggle_version import __version__
+from fugue_sql import FugueSQLWorkflow as Dag
+
 from fuggle.execution_engine import (
     KaggleDaskExecutionEngine,
     KaggleNativeExecutionEngine,
+    KaggleNotebookSetup,
     KaggleSparkExecutionEngine,
 )
 from fuggle.outputters import Plot, PlotBar, PlotBarH, PlotLine
-from fuggle.workflow import Dag
+
+
+def setup(default_engine: str = "") -> Any:
+    return fn.setup(KaggleNotebookSetup(default_engine))

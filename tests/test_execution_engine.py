@@ -83,6 +83,9 @@ class KaggleSparkExecutionEngineBuiltInTests(BuiltInTests.Tests):
     def dag(self) -> FugueSQLWorkflow:
         return FugueSQLWorkflow(self.engine)
 
+    def test_callback(self):
+        pass
+
     def test_sqlite(self):
         with self.dag() as dag:
             dag(
