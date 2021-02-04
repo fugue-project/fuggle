@@ -5,7 +5,7 @@ from matplotlib.gridspec import GridSpec
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 from fugue import DataFrames, Outputter, DataFrame
-from fugue.collections.partition import _parse_presort_exp
+from fugue.collections.partition import parse_presort_exp
 import pandas as pd
 from triad.utils.assertion import assert_or_throw
 
@@ -21,7 +21,7 @@ class Plot(Outputter):
         else:
             assert_or_throw("kind" not in self.params, f"can't reset kind {self.kind}")
         self.params.get("top_n", 0)
-        _parse_presort_exp(self.params.get("order_by", "a"))
+        parse_presort_exp(self.params.get("order_by", "a"))
         self.params.get_or_throw("x", str)
         y = self.params.get_or_none("y", object)
         gp = self.params.get_or_none("group", object)
@@ -43,7 +43,7 @@ class Plot(Outputter):
         top_n = self.params.get("top_n", 0)
         df = self._select_top(dfs[0], top_n).as_pandas()
         if "order_by" in self.params:
-            order_by: Any = _parse_presort_exp(
+            order_by: Any = parse_presort_exp(
                 self.params.get_or_throw("order_by", object)
             )
         else:
@@ -84,7 +84,7 @@ class Plot(Outputter):
             else:
                 order_expr = ""
                 if "order_by" in self.params:
-                    order_by = _parse_presort_exp(
+                    order_by = parse_presort_exp(
                         self.params.get_or_throw("order_by", object)
                     )
                     if len(order_by) > 0:

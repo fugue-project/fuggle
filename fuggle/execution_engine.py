@@ -71,11 +71,9 @@ class KaggleNativeExecutionEngine(NativeExecutionEngine):
     def __init__(self, conf: Any = None, use_sqlite: bool = False):
         super().__init__(conf)
         if not use_sqlite:
-            self._default_sql_engine = KaggleSQLEngineWrapper(
-                self, QPDPandasEngine(self)
-            )
+            self.set_sql_engine(KaggleSQLEngineWrapper(self, QPDPandasEngine(self)))
         else:  # pragma: no cover
-            self._default_sql_engine = KaggleSQLEngineWrapper(self, SqliteEngine(self))
+            self.set_sql_engine(KaggleSQLEngineWrapper(self, SqliteEngine(self)))
 
 
 class KaggleSparkExecutionEngine(SparkExecutionEngine):
@@ -94,7 +92,7 @@ class KaggleSparkExecutionEngine(SparkExecutionEngine):
             builder = builder.config(k, v)
         spark_session = builder.getOrCreate()
         super().__init__(spark_session=spark_session, conf=configs)
-        self._default_sql_engine = KaggleSQLEngineWrapper(self, SparkSQLEngine(self))
+        self.set_sql_engine(KaggleSQLEngineWrapper(self, SparkSQLEngine(self)))
 
 
 class KaggleDaskExecutionEngine(DaskExecutionEngine):
@@ -102,7 +100,7 @@ class KaggleDaskExecutionEngine(DaskExecutionEngine):
         configs = {FUGUE_DASK_CONF_DATAFRAME_DEFAULT_PARTITIONS: 16}
         configs.update(ParamDict(conf))
         super().__init__(conf=configs)
-        self._default_sql_engine = KaggleSQLEngineWrapper(self, QPDDaskEngine(self))
+        self.set_sql_engine(KaggleSQLEngineWrapper(self, QPDDaskEngine(self)))
 
 
 class KaggleNotebookSetup(NotebookSetup):
