@@ -4,6 +4,10 @@ Fugue for Kaggle users
 
 ## Release History
 
+### 0.1.8
+
+* Upgrade fugue dependency, handle breaking changes
+
 ### 0.1.7
 
 * Refactor fuggle based on fugue_notebook
