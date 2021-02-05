@@ -4,6 +4,10 @@ Fugue for Kaggle users
 
 ## Release History
 
+### 0.2.0
+
+* Upgrade fugue dependency
+
 ### 0.1.8
 
 * Upgrade fugue dependency, handle breaking changes
