@@ -18,10 +18,11 @@ setup(
     keywords="fugue kaggle sql spark dask pandas",
     url="http://github.com/fugue-project/fuggle",
     install_requires=[
-        "fugue[spark,dask,sql]==0.5.1",
+        "fugue[spark,dask,sql]>=0.5.2",
+        "tune>=0.0.2",
         "notebook",
         "kaggle",
-        "matplotlib",
+        "seaborn",
         "qpd",
         "dask[dataframe]",
     ],
