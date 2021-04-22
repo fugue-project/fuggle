@@ -19,7 +19,7 @@ setup(
     url="http://github.com/fugue-project/fuggle",
     install_requires=[
         "fugue[spark,dask,sql]==0.5.3",
-        "tune==0.0.3",
+        "tune[all]==0.0.3",
         "notebook",
         "kaggle",
         "seaborn",
