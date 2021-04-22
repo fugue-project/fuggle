@@ -4,6 +4,10 @@ Fugue for Kaggle users
 
 ## Release History
 
+### 0.2.1
+
+* Upgrade fugue dependency and add tune dependency and support
+
 ### 0.2.0
 
 * Upgrade fugue dependency
