@@ -73,7 +73,7 @@ class KaggleSQLEngineWrapper(SQLEngine):
 
 class KaggleNativeExecutionEngine(NativeExecutionEngine):
     def __init__(self, conf: Any = None, use_sqlite: bool = False):
-        configs = _process_confs(BASE_CONFIG, ParamDict(conf))
+        configs = _process_confs(ParamDict(conf))
         super().__init__(configs)
         if not use_sqlite:
             self.set_sql_engine(KaggleSQLEngineWrapper(self, QPDPandasEngine(self)))
@@ -84,7 +84,6 @@ class KaggleNativeExecutionEngine(NativeExecutionEngine):
 class KaggleSparkExecutionEngine(SparkExecutionEngine):
     def __init__(self, spark_session: Optional[SparkSession] = None, conf: Any = None):
         configs = _process_confs(
-            BASE_CONFIG,
             {
                 "fugue.spark.use_pandas_udf": True,
                 "spark.driver.memory": "14g",
@@ -106,7 +105,6 @@ class KaggleSparkExecutionEngine(SparkExecutionEngine):
 class KaggleDaskExecutionEngine(DaskExecutionEngine):
     def __init__(self, conf: Any = None):
         configs = _process_confs(
-            BASE_CONFIG,
             {FUGUE_DASK_CONF_DATAFRAME_DEFAULT_PARTITIONS: 16},
             ParamDict(conf),
         )
