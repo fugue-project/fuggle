@@ -4,6 +4,10 @@ Fugue for Kaggle users
 
 ## Release History
 
+### 0.2.3
+
+* Add config shortcut
+
 ### 0.2.2
 
 * Disable Fugue SQL highlighting on Kaggle, they no longer support it
