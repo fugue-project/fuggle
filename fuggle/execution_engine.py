@@ -1,6 +1,6 @@
 import os
 import sqlite3
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Iterable, Optional, Tuple
 
 import pandas as pd
 from fugue import (
@@ -27,6 +27,10 @@ from triad.utils.assertion import assert_or_throw
 from fuggle._utils import transform_sqlite_sql
 
 DEFAULT_KAGGLE_SQLITE_PATH = ""
+BASE_CONFIG: Dict[str, Any] = {
+    FUGUE_CONF_WORKFLOW_CHECKPOINT_PATH: "/tmp",
+    "fugue.rpc.server": "fugue.rpc.base.NativeRPCServer",
+}
 
 
 class QPDPandasEngine(SQLEngine):
@@ -69,7 +73,8 @@ class KaggleSQLEngineWrapper(SQLEngine):
 
 class KaggleNativeExecutionEngine(NativeExecutionEngine):
     def __init__(self, conf: Any = None, use_sqlite: bool = False):
-        super().__init__(conf)
+        configs = _process_confs(ParamDict(conf))
+        super().__init__(configs)
         if not use_sqlite:
             self.set_sql_engine(KaggleSQLEngineWrapper(self, QPDPandasEngine(self)))
         else:  # pragma: no cover
@@ -78,15 +83,17 @@ class KaggleNativeExecutionEngine(NativeExecutionEngine):
 
 class KaggleSparkExecutionEngine(SparkExecutionEngine):
     def __init__(self, spark_session: Optional[SparkSession] = None, conf: Any = None):
-        configs = {
-            "fugue.spark.use_pandas_udf": True,
-            "spark.driver.memory": "14g",
-            "spark.sql.shuffle.partitions": "16",
-            "spark.sql.execution.arrow.pyspark.fallback.enabled": True,
-            "spark.driver.extraJavaOptions": "-Dio.netty.tryReflectionSetAccessible=true",  # noqa: E501
-            "spark.executor.extraJavaOptions": "-Dio.netty.tryReflectionSetAccessible=true",  # noqa: E501
-        }
-        configs.update(ParamDict(conf))
+        configs = _process_confs(
+            {
+                "fugue.spark.use_pandas_udf": True,
+                "spark.driver.memory": "14g",
+                "spark.sql.shuffle.partitions": "16",
+                "spark.sql.execution.arrow.pyspark.fallback.enabled": True,
+                "spark.driver.extraJavaOptions": "-Dio.netty.tryReflectionSetAccessible=true",  # noqa: E501
+                "spark.executor.extraJavaOptions": "-Dio.netty.tryReflectionSetAccessible=true",  # noqa: E501
+            },
+            ParamDict(conf),
+        )
         builder = SparkSession.builder.master("local[*]")
         for k, v in configs.items():
             builder = builder.config(k, v)
@@ -97,8 +104,10 @@ class KaggleSparkExecutionEngine(SparkExecutionEngine):
 
 class KaggleDaskExecutionEngine(DaskExecutionEngine):
     def __init__(self, conf: Any = None):
-        configs = {FUGUE_DASK_CONF_DATAFRAME_DEFAULT_PARTITIONS: 16}
-        configs.update(ParamDict(conf))
+        configs = _process_confs(
+            {FUGUE_DASK_CONF_DATAFRAME_DEFAULT_PARTITIONS: 16},
+            ParamDict(conf),
+        )
         super().__init__(conf=configs)
         self.set_sql_engine(KaggleSQLEngineWrapper(self, QPDDaskEngine(self)))
 
@@ -108,7 +117,7 @@ class KaggleNotebookSetup(NotebookSetup):
         self._default_engine = default_engine
 
     def get_pre_conf(self) -> Dict[str, Any]:
-        return {FUGUE_CONF_WORKFLOW_CHECKPOINT_PATH: "/tmp"}
+        return BASE_CONFIG
 
     def register_execution_engines(self):
         super().register_execution_engines()
@@ -136,3 +145,25 @@ class KaggleNotebookSetup(NotebookSetup):
             register_default_execution_engine(
                 lambda conf, **kwargs: KaggleSparkExecutionEngine(conf=conf),
             )
+
+
+def _process_confs(*confs: Dict[str, Any]) -> Dict[str, Any]:
+    result: Dict[str, Any] = {}
+    for conf in confs:
+        for k, v in _process_conf(conf):
+            result[k] = v
+    return result
+
+
+def _process_conf(conf: Dict[str, Any]) -> Iterable[Tuple[str, Any]]:
+    for k, v in conf.items():
+        if k == "callback":
+            if v:
+                yield "fugue.rpc.server", "fugue.rpc.flask.FlaskRPCServer"
+                yield "fugue.rpc.flask_server.host", "127.0.0.1"
+                yield "fugue.rpc.flask_server.port", "7777"
+                yield "fugue.rpc.flask_server.timeout", "5 sec"
+            else:
+                yield "fugue.rpc.server", "fugue.rpc.base.NativeRPCServer"
+        else:
+            yield k, v
