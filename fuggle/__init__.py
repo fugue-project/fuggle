@@ -7,12 +7,12 @@ from fugue_sql import FugueSQLWorkflow as Dag
 from IPython import get_ipython
 from tune import TUNE_OBJECT_FACTORY, Monitor, NonIterativeObjectiveRunner
 from tune_hyperopt import HyperoptRunner
-from tune_notebook.vis import (
+from tune_notebook import (
     NotebookSimpleHist,
     NotebookSimpleRungs,
     NotebookSimpleTimeSeries,
+    PrintBest,
 )
-
 from fuggle.execution_engine import (
     KaggleDaskExecutionEngine,
     KaggleNativeExecutionEngine,
@@ -48,4 +48,6 @@ def _to_monitor(obj: Any) -> Optional[Monitor]:
             return NotebookSimpleRungs()
         if obj == "ts":
             return NotebookSimpleTimeSeries()
+        if obj == "text":
+            return PrintBest()
     raise NotImplementedError(obj)

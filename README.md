@@ -4,6 +4,10 @@ Fugue for Kaggle users
 
 ## Release History
 
+### 0.2.4
+
+* Update tune version
+
 ### 0.2.3
 
 * Add config shortcut
