@@ -4,6 +4,10 @@ Fugue for Kaggle users
 
 ## Release History
 
+### 0.2.7
+
+* Update fugue and tune versions
+
 ### 0.2.6
 
 * Update tune version
