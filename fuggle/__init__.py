@@ -24,7 +24,7 @@ from fuggle.outputters import Plot, PlotBar, PlotBarH, PlotLine
 
 def setup(default_engine: str = "") -> Any:
     TUNE_OBJECT_FACTORY.set_temp_path("/tmp")
-    TUNE_OBJECT_FACTORY.set_noniterative_objective_runner_converter(_to_runner)
+    TUNE_OBJECT_FACTORY.set_noniterative_local_optimizer_converter(_to_runner)
     TUNE_OBJECT_FACTORY.set_monitor_converter(_to_monitor)
 
     # we no longer enable SQL highlighting, kaggle has changed
@@ -35,12 +35,16 @@ def setup(default_engine: str = "") -> Any:
 def _to_runner(obj: Any) -> Optional[NonIterativeObjectiveLocalOptimizer]:
     if obj is None:
         return HyperoptLocalOptimizer(20, 0)
+    if isinstance(obj, NonIterativeObjectiveLocalOptimizer):
+        return obj
     raise NotImplementedError(obj)
 
 
 def _to_monitor(obj: Any) -> Optional[Monitor]:
     if obj is None:
         return None
+    if isinstance(obj, Monitor):
+        return obj
     if isinstance(obj, str):
         if obj == "hist":
             return NotebookSimpleHist()
