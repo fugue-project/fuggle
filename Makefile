@@ -11,6 +11,7 @@ help:
 devenv:
 	pip3 install -r requirements.txt
 	pre-commit install
+	bash scripts/add_avro_jar.sh
 
 dev:
 	pip3 install -r requirements.txt

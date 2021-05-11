@@ -25,6 +25,7 @@ setup(
         "seaborn",
         "qpd",
         "dask[dataframe]",
+        "pandavro",
     ],
     extras_require={},
     classifiers=[
