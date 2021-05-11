@@ -5,7 +5,7 @@ import fugue_notebook as fn
 from fuggle_version import __version__
 from fugue_sql import FugueSQLWorkflow as Dag
 from IPython import get_ipython
-from tune import TUNE_OBJECT_FACTORY, Monitor, NonIterativeObjectiveRunner
+from tune import TUNE_OBJECT_FACTORY, Monitor, NonIterativeObjectiveLocalOptimizer
 from tune_hyperopt import HyperoptRunner
 from tune_notebook import (
     NotebookSimpleHist,
@@ -32,7 +32,7 @@ def setup(default_engine: str = "") -> Any:
     fn._setup_fugue_notebook(ip, KaggleNotebookSetup(default_engine))
 
 
-def _to_runner(obj: Any) -> Optional[NonIterativeObjectiveRunner]:
+def _to_runner(obj: Any) -> Optional[NonIterativeObjectiveLocalOptimizer]:
     if obj is None:
         return HyperoptRunner(20, 0)
     raise NotImplementedError(obj)
