@@ -109,7 +109,15 @@ class KaggleDaskExecutionEngine(DaskExecutionEngine):
             ParamDict(conf),
         )
         super().__init__(conf=configs)
-        self.set_sql_engine(KaggleSQLEngineWrapper(self, QPDDaskEngine(self)))
+        try:
+            from dask_sql.integrations.fugue import DaskSQLExecutionEngine
+
+            self.set_sql_engine(
+                KaggleSQLEngineWrapper(self, DaskSQLExecutionEngine(self))
+            )
+            print("dask-sql is set as the SQL Engine for Dask")
+        except ImportError:
+            self.set_sql_engine(KaggleSQLEngineWrapper(self, QPDDaskEngine(self)))
 
 
 class KaggleNotebookSetup(NotebookSetup):
