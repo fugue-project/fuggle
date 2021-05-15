@@ -14,6 +14,10 @@ Fugue for Kaggle users
 
 ### 0.2.8
 
+* Update fugue and dask
+
+### 0.2.8
+
 * Update tune init
 
 ### 0.2.7
