@@ -4,6 +4,14 @@ Fugue for Kaggle users
 
 ## Release History
 
+### 0.3.0
+
+* Fix dask-sql dependency
+
+### 0.2.9
+
+* Update fugue and dask
+
 ### 0.2.8
 
 * Update fugue and dask
