@@ -28,7 +28,7 @@ setup(
         "pandavro",
     ],
     extras_require={
-        "dasksql": ["dask-sql==0.3.3"],
+        "dasksql": ["dask-sql!=0.3.4"],
         "blazing": ["fugue-blazing==0.0.3"],
     },
     classifiers=[

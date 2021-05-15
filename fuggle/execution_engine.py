@@ -110,11 +110,9 @@ class KaggleDaskExecutionEngine(DaskExecutionEngine):
         )
         super().__init__(conf=configs)
         try:
-            from dask_sql.integrations.fugue import DaskSQLExecutionEngine
+            from dask_sql.integrations.fugue import DaskSQLEngine
 
-            self.set_sql_engine(
-                KaggleSQLEngineWrapper(self, DaskSQLExecutionEngine(self))
-            )
+            self.set_sql_engine(KaggleSQLEngineWrapper(self, DaskSQLEngine(self)))
             print("dask-sql is set as the SQL Engine for Dask")
         except ImportError:
             self.set_sql_engine(KaggleSQLEngineWrapper(self, QPDDaskEngine(self)))
