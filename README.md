@@ -4,6 +4,10 @@ Fugue for Kaggle users
 
 ## Release History
 
+### 0.3.1
+
+* Use Fugue 0.6.0
+
 ### 0.3.0
 
 * Fix dask-sql dependency
