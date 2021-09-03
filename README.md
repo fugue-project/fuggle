@@ -4,6 +4,11 @@ Fugue for Kaggle users
 
 ## Release History
 
+### 0.3.2
+
+* Use Fugue 0.6.2
+* Make spark config smarter
+
 ### 0.3.1
 
 * Use Fugue 0.6.0
