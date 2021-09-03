@@ -3,6 +3,7 @@ import sqlite3
 from typing import Any, Dict, Iterable, Optional, Tuple
 
 import pandas as pd
+import psutil
 from fugue import (
     DataFrame,
     DataFrames,
@@ -86,8 +87,8 @@ class KaggleSparkExecutionEngine(SparkExecutionEngine):
         configs = _process_confs(
             {
                 "fugue.spark.use_pandas_udf": True,
-                "spark.driver.memory": "14g",
-                "spark.sql.shuffle.partitions": "16",
+                "spark.driver.memory": _get_optimal_mem(),
+                "spark.sql.shuffle.partitions": _get_optimal_partition(),
                 "spark.sql.execution.arrow.pyspark.fallback.enabled": True,
                 "spark.driver.extraJavaOptions": "-Dio.netty.tryReflectionSetAccessible=true",  # noqa: E501
                 "spark.executor.extraJavaOptions": "-Dio.netty.tryReflectionSetAccessible=true",  # noqa: E501
@@ -105,7 +106,7 @@ class KaggleSparkExecutionEngine(SparkExecutionEngine):
 class KaggleDaskExecutionEngine(DaskExecutionEngine):
     def __init__(self, conf: Any = None):
         configs = _process_confs(
-            {FUGUE_DASK_CONF_DATAFRAME_DEFAULT_PARTITIONS: 16},
+            {FUGUE_DASK_CONF_DATAFRAME_DEFAULT_PARTITIONS: _get_optimal_partition()},
             ParamDict(conf),
         )
         super().__init__(conf=configs)
@@ -173,3 +174,12 @@ def _process_conf(conf: Dict[str, Any]) -> Iterable[Tuple[str, Any]]:
                 yield "fugue.rpc.server", "fugue.rpc.base.NativeRPCServer"
         else:
             yield k, v
+
+
+def _get_optimal_mem(ratio: float = 0.8) -> str:
+    mem = psutil.virtual_memory()
+    return str(int(mem.total * ratio / 1024 / 1024)) + "m"
+
+
+def _get_optimal_partition() -> int:
+    return psutil.cpu_count() * 4
