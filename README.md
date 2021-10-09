@@ -4,6 +4,10 @@ Fugue for Kaggle users
 
 ## Release History
 
+### 0.3.3
+
+* Use Fugue 0.6.3
+
 ### 0.3.2
 
 * Use Fugue 0.6.2
