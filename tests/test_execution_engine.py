@@ -32,8 +32,8 @@ class KaggleNativeExecutionEngineBuiltInTests(BuiltInTests.Tests):
         )
         return e
 
-    def dag(self) -> FugueSQLWorkflow:
-        return FugueSQLWorkflow(self.engine)
+    def dag(self, conf=None) -> FugueSQLWorkflow:
+        return FugueSQLWorkflow(self.engine, conf)
 
     def test_sqlite(self):
         with self.dag() as dag:
@@ -65,8 +65,6 @@ class KaggleSparkExecutionEngineTests(ExecutionEngineTests.Tests):
     def test_sample_n(self):
         pass
 
-    
-
 
 class KaggleSparkExecutionEngineBuiltInTests(BuiltInTests.Tests):
     @pytest.fixture(autouse=True)
@@ -82,8 +80,8 @@ class KaggleSparkExecutionEngineBuiltInTests(BuiltInTests.Tests):
         )
         return e
 
-    def dag(self) -> FugueSQLWorkflow:
-        return FugueSQLWorkflow(self.engine)
+    def dag(self, conf=None) -> FugueSQLWorkflow:
+        return FugueSQLWorkflow(self.engine, conf)
 
     def test_callback(self):
         pass
@@ -132,8 +130,8 @@ class DaskExecutionEngineBuiltInTests(BuiltInTests.Tests):
         )
         return e
 
-    def dag(self) -> FugueSQLWorkflow:
-        return FugueSQLWorkflow(self.engine)
+    def dag(self, conf=None) -> FugueSQLWorkflow:
+        return FugueSQLWorkflow(self.engine, conf)
 
     def test_sqlite(self):
         with self.dag() as dag:
