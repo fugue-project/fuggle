@@ -15,7 +15,10 @@ from fugue import (
     register_default_execution_engine,
     register_execution_engine,
 )
-from fugue.constants import FUGUE_CONF_WORKFLOW_CHECKPOINT_PATH
+from fugue.constants import (
+    FUGUE_CONF_SQL_IGNORE_CASE,
+    FUGUE_CONF_WORKFLOW_CHECKPOINT_PATH,
+)
 from fugue_dask._constants import FUGUE_DASK_CONF_DATAFRAME_DEFAULT_PARTITIONS
 from fugue_dask.execution_engine import DaskExecutionEngine, QPDDaskEngine
 from fugue_notebook import NotebookSetup
@@ -44,7 +47,13 @@ class QPDPandasEngine(SQLEngine):
 
     def select(self, dfs: DataFrames, statement: str) -> DataFrame:
         pd_dfs = {k: self.execution_engine.to_df(v).as_pandas() for k, v in dfs.items()}
-        df = run_sql_on_pandas(statement, pd_dfs)
+        df = run_sql_on_pandas(
+            statement,
+            pd_dfs,
+            ignore_case=self.execution_engine.compile_conf.get(
+                FUGUE_CONF_SQL_IGNORE_CASE, False
+            ),
+        )
         return PandasDataFrame(df)
 
 
